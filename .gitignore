@@ -8,11 +8,18 @@ env/
 venv/
 .venv/
 
-# AetherDesk Runtime State & Logs
+# AirDesk Runtime State & Logs
 *.pid
 *.log
+airdesk.pid
+airdesk.log
 aetherdesk.pid
 aetherdesk.log
+
+# PyInstaller Build Artifacts
+build/
+dist/
+*.spec
 
 # Build Tools & Android Intermediate Build Artifacts
 build_tools/

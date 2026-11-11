@@ -6,6 +6,7 @@
 [![YouTube](https://img.shields.io/badge/YouTube-Freelancer%20Fahim%20Islam-FF0000?logo=youtube)](https://www.youtube.com/@FreelancerFahimIslam/videos)
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-%40CoderFahim-25D366?logo=whatsapp)](https://wa.me/message/CoderFahim)
 [![Hardware Acceleration](https://img.shields.io/badge/Hardware%20Accel-NVIDIA%20RTX%20%7C%20DirectX%20Duplication-green?logo=nvidia)](https://github.com/ra1nty/DXcam)
+[![Windows EXE](https://img.shields.io/badge/Windows-Portable%20EXE-0078D6?logo=windows)](releases/AirDesk.exe)
 [![Android](https://img.shields.io/badge/Android-APK%20Included-brightgreen?logo=android)](releases/AirDesk.apk)
 [![Latency](https://img.shields.io/badge/Latency-%3C50ms-orange)](#-performance--architecture)
 
@@ -73,16 +74,19 @@ flowchart LR
 
 | File / Folder | Purpose |
 | :--- | :--- |
+| **[`AirDesk.exe`](releases/AirDesk.exe)** | **Standalone Windows Portable Executable**: Zero Python installation required. Double-click to run! |
 | **[`setup.bat`](setup.bat)** | **One-Click Universal Setup**: Checks Python, installs dependencies, and configures Windows Firewall automatically. |
 | **[`start.bat`](start.bat)** | Interactive launcher showing local IP, developer info, and terminal ASCII QR code for camera scanning. |
 | **[`install_startup.bat`](install_startup.bat)** | UAC-elevated installer to make AirDesk automatically run invisibly whenever Windows boots. |
 | **[`stop.bat`](stop.bat)** | Safely stops any running background server processes. |
-| **[`AirDesk.apk`](AirDesk.apk)** | **Universal Android APK**: Pre-compiled, signed (V1/V2/V3), and ready to install on Android phones and tablets. |
-| **[`releases/`](releases/)** | Holds release-ready APK packages for instant download. |
+| **[`AirDesk.apk`](releases/AirDesk.apk)** | **Universal Android APK**: Pre-compiled, signed (V1/V2/V3), and ready to install on Android phones and tablets. |
+| **[`releases/`](releases/)** | Holds release-ready executable (`AirDesk.exe`) and APK packages for instant download. |
 | **[`android_app/`](android_app/)** | Complete native Android source code (compatible with Android Studio or CLI D8/AAPT2). |
 | **[`server.py`](server.py)** | FastAPI backend, WebSockets, WebRTC signaling, and UDP discovery engine. |
 | **[`streamer.py`](streamer.py)** | DirectX Desktop Duplication capture with GDI fallback and mouse cursor overlay. |
 | **[`input_controller.py`](input_controller.py)** | Win32 input simulator for high-precision trackpad, absolute touch, and Unicode typing. |
+| **[`build_exe.py`](build_exe.py)** | One-click PyInstaller script to compile `AirDesk.exe`. |
+| **[`build_apk.py`](build_apk.py)** | Automated Android compiler and signer for `AirDesk.apk`. |
 
 ---
 

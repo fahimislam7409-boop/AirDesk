@@ -1,8 +1,16 @@
 import ctypes
 from ctypes import wintypes
 import time
-import cv2
+import io
 import numpy as np
+from PIL import Image, ImageDraw
+
+try:
+    import cv2
+    HAS_CV2 = True
+except ImportError:
+    cv2 = None
+    HAS_CV2 = False
 
 user32 = ctypes.windll.user32
 gdi32 = ctypes.windll.gdi32
@@ -77,17 +85,32 @@ class ScreenStreamer:
                     cy = ci.ptScreenPos.y
                     h, w = img.shape[:2]
                     if 0 <= cx < w and 0 <= cy < h:
-                        pts = np.array([
-                            [cx, cy],
-                            [cx, cy + 18],
-                            [cx + 5, cy + 14],
-                            [cx + 9, cy + 22],
-                            [cx + 12, cy + 20],
-                            [cx + 8, cy + 13],
-                            [cx + 14, cy + 13]
-                        ], dtype=np.int32)
-                        cv2.polylines(img, [pts], True, (0, 0, 0), 2, cv2.LINE_AA)
-                        cv2.fillPoly(img, [pts], (255, 255, 255), cv2.LINE_AA)
+                        if HAS_CV2:
+                            pts = np.array([
+                                [cx, cy],
+                                [cx, cy + 18],
+                                [cx + 5, cy + 14],
+                                [cx + 9, cy + 22],
+                                [cx + 12, cy + 20],
+                                [cx + 8, cy + 13],
+                                [cx + 14, cy + 13]
+                            ], dtype=np.int32)
+                            cv2.polylines(img, [pts], True, (0, 0, 0), 2, cv2.LINE_AA)
+                            cv2.fillPoly(img, [pts], (255, 255, 255), cv2.LINE_AA)
+                        else:
+                            pil_img = Image.fromarray(img)
+                            draw = ImageDraw.Draw(pil_img)
+                            pts = [
+                                (cx, cy),
+                                (cx, cy + 18),
+                                (cx + 5, cy + 14),
+                                (cx + 9, cy + 22),
+                                (cx + 12, cy + 20),
+                                (cx + 8, cy + 13),
+                                (cx + 14, cy + 13)
+                            ]
+                            draw.polygon(pts, fill=(255, 255, 255), outline=(0, 0, 0))
+                            img[:] = np.asarray(pil_img)[:]
         except Exception:
             pass
 
@@ -135,8 +158,14 @@ class ScreenStreamer:
         if frame is None:
             sw, sh = self.get_screen_size()
             frame = np.zeros((sh, sw, 3), dtype=np.uint8)
-            cv2.putText(frame, "AetherDesk: Initializing Desktop...", (50, sh // 2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (200, 200, 200), 2)
+            if HAS_CV2:
+                cv2.putText(frame, "AirDesk: Initializing Desktop...", (50, sh // 2),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (200, 200, 200), 2)
+            else:
+                pimg = Image.fromarray(frame)
+                d = ImageDraw.Draw(pimg)
+                d.text((50, sh // 2), "AirDesk: Initializing Desktop...", fill=(200, 200, 200))
+                frame[:] = np.asarray(pimg)[:]
 
         if draw_cursor:
             self._draw_cursor(frame)
@@ -152,12 +181,23 @@ class ScreenStreamer:
         q = int(quality if quality is not None else self.quality)
         s = float(scale if scale is not None else self.scale)
 
-        if s < 0.99:
-            h, w = frame.shape[:2]
-            nw, nh = max(320, int(w * s)), max(240, int(h * s))
-            frame = cv2.resize(frame, (nw, nh), interpolation=cv2.INTER_LINEAR)
+        if HAS_CV2:
+            if s < 0.99:
+                h, w = frame.shape[:2]
+                nw, nh = max(320, int(w * s)), max(240, int(h * s))
+                frame = cv2.resize(frame, (nw, nh), interpolation=cv2.INTER_LINEAR)
+            ret, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, q])
+            if ret:
+                return jpeg.tobytes()
+        else:
+            pil_img = Image.fromarray(frame)
+            if s < 0.99:
+                w, h = pil_img.size
+                nw, nh = max(320, int(w * s)), max(240, int(h * s))
+                pil_img = pil_img.resize((nw, nh), Image.Resampling.BILINEAR)
+            buf = io.BytesIO()
+            pil_img.save(buf, format="JPEG", quality=q)
+            return buf.getvalue()
 
-        ret, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, q])
-        if ret:
-            return jpeg.tobytes()
+        return None
         return None

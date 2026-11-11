@@ -23,12 +23,19 @@ import qrcode
 from streamer import ScreenStreamer, attach_thread_to_desktop
 from input_controller import InputController
 
-# Directory paths
-BASE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = BASE_DIR / "static"
-CONFIG_FILE = BASE_DIR / "config.json"
-PID_FILE = BASE_DIR / "airdesk.pid"
-LOG_FILE = BASE_DIR / "airdesk.log"
+# Directory paths (supports standalone PyInstaller EXE bundle)
+if getattr(sys, "frozen", False):
+    BUNDLE_DIR = Path(sys._MEIPASS)
+    APP_DIR = Path(sys.executable).resolve().parent
+else:
+    BUNDLE_DIR = Path(__file__).resolve().parent
+    APP_DIR = BUNDLE_DIR
+
+BASE_DIR = APP_DIR
+STATIC_DIR = BUNDLE_DIR / "static"
+CONFIG_FILE = APP_DIR / "config.json"
+PID_FILE = APP_DIR / "airdesk.pid"
+LOG_FILE = APP_DIR / "airdesk.log"
 
 # Save PID for clean stopping
 try:
@@ -214,14 +221,16 @@ async def get_manifest():
 @app.api_route("/apk", methods=["GET", "HEAD"])
 @app.api_route("/download", methods=["GET", "HEAD"])
 async def download_apk():
-    for name in ["AirDesk.apk", "AirDesk_RedmiPadPro.apk", "AetherDesk_RedmiPadPro.apk"]:
-        apk_path = BASE_DIR / name
-        if apk_path.exists():
-            return FileResponse(
-                path=str(apk_path),
-                filename="AirDesk.apk",
-                media_type="application/vnd.android.package-archive"
-            )
+    search_dirs = [APP_DIR, BUNDLE_DIR, APP_DIR / "releases", BUNDLE_DIR / "releases"]
+    for d in search_dirs:
+        for name in ["AirDesk.apk", "AirDesk_RedmiPadPro.apk"]:
+            apk_path = d / name
+            if apk_path.exists():
+                return FileResponse(
+                    path=str(apk_path),
+                    filename="AirDesk.apk",
+                    media_type="application/vnd.android.package-archive"
+                )
     raise HTTPException(status_code=404, detail="APK file not found")
 
 @app.post("/api/login")
