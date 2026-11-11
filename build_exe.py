@@ -21,7 +21,7 @@ cmd = [
     "PyInstaller",
     "--noconfirm",
     "--onefile",
-    "--console",  # Shows the live ASCII QR code and local IP on launch
+    "--windowed",  # Opens directly as a professional Desktop GUI Application (No CMD window!)
     "--name", "AirDesk",
     "--icon", ICO_PATH,
     "--add-data", f"{STATIC_PATH};static",
@@ -31,6 +31,11 @@ cmd = [
     "--exclude-module", "matplotlib",
     "--exclude-module", "tkinter",
     "--exclude-module", "yt_dlp",
+    "--hidden-import", "webview",
+    "--hidden-import", "webview.platforms.winforms",
+    "--hidden-import", "clr",
+    "--hidden-import", "pythonnet",
+    "--hidden-import", "psutil",
     "--hidden-import", "uvicorn.logging",
     "--hidden-import", "uvicorn.loops",
     "--hidden-import", "uvicorn.loops.auto",

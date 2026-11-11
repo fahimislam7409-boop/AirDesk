@@ -6,9 +6,12 @@ import socket
 import asyncio
 import fractions
 import secrets
+import io
+import base64
 from pathlib import Path
 from contextlib import asynccontextmanager
 
+import psutil
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
@@ -36,6 +39,34 @@ STATIC_DIR = BUNDLE_DIR / "static"
 CONFIG_FILE = APP_DIR / "config.json"
 PID_FILE = APP_DIR / "airdesk.pid"
 LOG_FILE = APP_DIR / "airdesk.log"
+
+def free_port(port: int):
+    """Ensure port is available by terminating stale instances."""
+    current_pid = os.getpid()
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            if proc.pid == current_pid:
+                continue
+            for conn in proc.net_connections(kind='inet'):
+                if conn.laddr and conn.laddr.port == port and conn.status == psutil.CONN_LISTEN:
+                    print(f"[PortManager] Port {port} occupied by PID {proc.pid} ({proc.name()}). Terminating old instance...")
+                    proc.kill()
+                    proc.wait(timeout=1.5)
+                    time.sleep(0.3)
+                    break
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.TimeoutExpired, Exception):
+            pass
+
+def generate_qr_base64(url: str) -> str:
+    try:
+        qr = qrcode.QRCode(border=1)
+        qr.add_data(url)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+    except Exception:
+        return ""
 
 # Save PID for clean stopping
 try:
@@ -217,6 +248,28 @@ async def get_manifest():
     if manifest_path.exists():
         return FileResponse(manifest_path, media_type="application/manifest+json")
     raise HTTPException(status_code=404, detail="manifest.json not found")
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def get_dashboard():
+    dashboard_path = STATIC_DIR / "dashboard.html"
+    if dashboard_path.exists():
+        return FileResponse(dashboard_path)
+    return "<h1>AirDesk: static/dashboard.html not found.</h1>"
+
+@app.get("/api/dashboard_info")
+async def get_dashboard_info():
+    ip = get_local_ip()
+    port = int(config.get("port", 8000))
+    url = f"http://{ip}:{port}"
+    qr_b64 = generate_qr_base64(url)
+    return {
+        "url": url,
+        "qr_base64": qr_b64,
+        "pin": config.get("pin", "123456"),
+        "hostname": socket.gethostname(),
+        "gpu": "NVIDIA GeForce RTX 5060 (DXCam GPU Duplication)",
+        "port": port
+    }
 
 @app.api_route("/apk", methods=["GET", "HEAD"])
 @app.api_route("/download", methods=["GET", "HEAD"])
@@ -439,20 +492,73 @@ def print_banner(ip, port):
     print("=" * 60)
     print("  (Press Ctrl+C to stop the server)\n")
 
+class DesktopBridge:
+    def open_browser(self, url):
+        import webbrowser
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
+
 if __name__ == "__main__":
     ip = get_local_ip()
     port = int(config.get("port", 8000))
     is_silent = "--silent" in sys.argv
+    is_cli = "--cli" in sys.argv or "--headless" in sys.argv or is_silent
 
-    if not is_silent:
-        print_banner(ip, port)
+    # 1. Clean port 8000 if occupied by old instance to prevent WinError 10048
+    free_port(port)
 
     attach_thread_to_desktop()
 
-    uvicorn.run(
-        app,
-        host=config.get("host", "0.0.0.0"),
-        port=port,
-        log_level="warning" if is_silent else "info",
-        access_log=False if is_silent else True
-    )
+    if is_cli:
+        if not is_silent:
+            print_banner(ip, port)
+        uvicorn.run(
+            app,
+            host=config.get("host", "0.0.0.0"),
+            port=port,
+            log_level="warning" if is_silent else "info",
+            access_log=False if is_silent else True
+        )
+    else:
+        # Modern Desktop GUI Dashboard Mode
+        try:
+            import webview
+            import threading
+            has_gui = True
+        except ImportError:
+            has_gui = False
+
+        if has_gui:
+            server_config = uvicorn.Config(
+                app,
+                host=config.get("host", "0.0.0.0"),
+                port=port,
+                log_level="warning",
+                access_log=False
+            )
+            server = uvicorn.Server(server_config)
+            server_thread = threading.Thread(target=server.run, daemon=True)
+            server_thread.start()
+
+            # Wait briefly for server to bind
+            time.sleep(0.6)
+
+            bridge = DesktopBridge()
+            dashboard_url = f"http://127.0.0.1:{port}/dashboard"
+
+            window = webview.create_window(
+                title="AirDesk - Personal Remote Desktop",
+                url=dashboard_url,
+                js_api=bridge,
+                width=960,
+                height=680,
+                min_size=(800, 560),
+                background_color="#090d16"
+            )
+            webview.start()
+            server.should_exit = True
+        else:
+            print_banner(ip, port)
+            uvicorn.run(app, host=config.get("host", "0.0.0.0"), port=port)

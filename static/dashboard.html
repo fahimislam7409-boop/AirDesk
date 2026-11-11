@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AirDesk - Personal Remote Desktop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(255, 255, 255, 0.035);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.25);
+      --amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #172554 0%, var(--bg) 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Titlebar */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(9, 13, 22, 0.7);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 40%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-size: 12px;
+      font-weight: 700;
+      color: #34d399;
+      letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 22px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Left Card: QR & Quick Connect */
+    .qr-container {
+      background: #fff;
+      padding: 12px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+      width: 190px;
+      height: 190px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      margin-bottom: 16px;
+    }
+
+    .qr-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .url-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .url-text {
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .copy-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .pin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .pin-display {
+      font-family: monospace;
+      font-size: 16px;
+      letter-spacing: 2px;
+      font-weight: bold;
+      color: #fbbf24;
+    }
+
+    /* Right Card: Host Info & Hardware */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .hardware-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .hardware-badge span {
+      font-size: 13px;
+      font-weight: 600;
+      color: #a7f3d0;
+    }
+
+    .apk-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(16, 185, 129, 0.15));
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-top: auto;
+    }
+
+    .apk-cta-text h4 {
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .apk-cta-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .btn-download {
+      background: var(--accent);
+      color: #000;
+      font-weight: bold;
+      font-size: 12px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-download:hover {
+      box-shadow: 0 0 15px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Footer / Developer Section */
+    footer {
+      background: rgba(9, 13, 22, 0.9);
+      border-top: 1px solid var(--card-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+    }
+
+    .dev-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .dev-info b {
+      color: var(--accent);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .soc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .soc-pill.fb { color: #60a5fa; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); }
+    .soc-pill.yt { color: #f87171; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.3); }
+    .soc-pill.wa { color: #4ade80; background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.3); }
+    .soc-pill.gh { color: #c084fc; background: rgba(192, 132, 252, 0.1); border: 1px solid rgba(192, 132, 252, 0.3); }
+
+    .soc-pill:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Titlebar -->
+  <header>
+    <div class="brand">
+      <img src="/static/icon.png" alt="AirDesk Logo">
+      <div>
+        <h1>AirDesk</h1>
+      </div>
+    </div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span id="txt-server-status">SERVER ACTIVE & STREAMING</span>
+    </div>
+  </header>
+
+  <!-- Main Dashboard -->
+  <main>
+    <!-- Left Card: Connect & QR -->
+    <div class="card">
+      <div class="card-title">
+        <span>📱</span> Tablet & Mobile Connect
+      </div>
+
+      <div class="qr-container">
+        <img id="qr-img" src="" alt="Scan QR Code">
+      </div>
+
+      <div class="url-box">
+        <span class="url-text" id="lbl-url">http://...</span>
+        <button class="copy-btn" id="btn-copy">Copy URL</button>
+      </div>
+
+      <div class="pin-row">
+        <div>
+          <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Security PIN:</span>
+          <div class="pin-display" id="lbl-pin">123456</div>
+        </div>
+        <button class="copy-btn" id="btn-browser">Open Browser</button>
+      </div>
+
+      <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 4px;">
+        💡 <b>Pro Tip:</b> Point your Redmi Pad Pro or phone camera at the QR code above to connect instantly without typing anything!
+      </div>
+    </div>
+
+    <!-- Right Card: Host Info & Performance -->
+    <div class="card">
+      <div class="card-title">
+        <span>🖥️</span> Host System & Acceleration
+      </div>
+
+      <div class="hardware-badge">
+        <span style="font-size: 20px;">🎮</span>
+        <div>
+          <div style="font-size: 11px; color: #6ee7b7; text-transform: uppercase; font-weight: bold;">Hardware Acceleration</div>
+          <span id="lbl-gpu">NVIDIA RTX 5060 (DXCam Desktop Duplication)</span>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-pill">
+          <div class="stat-label">Host Machine</div>
+          <div class="stat-value" id="lbl-hostname">PC</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-label">Target Latency</div>
+          <div class="stat-value" style="color: #34d399;">&lt; 30 ms (Ultra Low)</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-label">Capture Engine</div>
+          <div class="stat-value">DirectX 11 / DXCam</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-label">Stream Protocol</div>
+          <div class="stat-value">Turbo Canvas & WebRTC</div>
+        </div>
+      </div>
+
+      <div class="apk-cta">
+        <div class="apk-cta-text">
+          <h4>📱 Get AirDesk for Android</h4>
+          <p>Optimized for Redmi Pad Pro & Android phones</p>
+        </div>
+        <a href="/apk" download class="btn-download" id="btn-apk">Download APK</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Developer Card -->
+  <footer>
+    <div class="dev-info">
+      <span>👨‍💻 Created by <b>Fahim Islam</b></span>
+      <span>•</span>
+      <span>v2.2.0 Open Source</span>
+    </div>
+
+    <div class="social-links">
+      <a onclick="openExternal('https://www.facebook.com/fahim.islam.7409/')" class="soc-pill fb">Facebook</a>
+      <a onclick="openExternal('https://www.youtube.com/@FreelancerFahimIslam/videos')" class="soc-pill yt">YouTube</a>
+      <a onclick="openExternal('https://wa.me/message/CoderFahim')" class="soc-pill wa">@CoderFahim</a>
+      <a onclick="openExternal('https://github.com/fahimislam7409-boop/AirDesk')" class="soc-pill gh">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    // Copy URL functionality
+    document.getElementById('btn-copy').addEventListener('click', function() {
+      const url = document.getElementById('lbl-url').innerText;
+      navigator.clipboard.writeText(url).then(() => {
+        this.innerText = 'Copied! ✓';
+        setTimeout(() => this.innerText = 'Copy URL', 2000);
+      });
+    });
+
+    document.getElementById('btn-browser').addEventListener('click', function() {
+      const url = document.getElementById('lbl-url').innerText;
+      openExternal(url);
+    });
+
+    function openExternal(url) {
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.open_browser) {
+        window.pywebview.api.open_browser(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+
+    // Load server status
+    async function loadData() {
+      try {
+        const res = await fetch('/api/dashboard_info');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('lbl-url').innerText = data.url;
+          document.getElementById('qr-img').src = data.qr_base64;
+          document.getElementById('lbl-pin').innerText = data.pin;
+          document.getElementById('lbl-hostname').innerText = data.hostname;
+          if (data.gpu) document.getElementById('lbl-gpu').innerText = data.gpu;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Polling or initial load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      setInterval(loadData, 5000);
+    });
+  </script>
+</body>
+</html>
