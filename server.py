@@ -40,6 +40,69 @@ CONFIG_FILE = APP_DIR / "config.json"
 PID_FILE = APP_DIR / "airdesk.pid"
 LOG_FILE = APP_DIR / "airdesk.log"
 
+# Safe stdout / stderr stream handler:
+# 1. Reconfigures stream to UTF-8 with character replacement so cp1252 never crashes on emojis.
+# 2. Replaces None with a dummy logger so PyInstaller windowed/noconsole apps never throw NoneType errors.
+class SafeStream:
+    def __init__(self, target, log_file=None):
+        self.target = target
+        self.log_file = log_file
+
+    def write(self, s):
+        if not s:
+            return
+        if self.target is not None:
+            try:
+                self.target.write(s)
+            except UnicodeEncodeError:
+                try:
+                    encoding = getattr(self.target, 'encoding', 'ascii') or 'ascii'
+                    cleaned = s.encode(encoding, errors='replace').decode(encoding, errors='replace')
+                    self.target.write(cleaned)
+                except Exception:
+                    pass
+            except Exception:
+                pass
+        if self.log_file:
+            try:
+                with open(self.log_file, "a", encoding="utf-8") as f:
+                    f.write(s)
+            except Exception:
+                pass
+
+    def flush(self):
+        if self.target is not None:
+            try:
+                self.target.flush()
+            except Exception:
+                pass
+
+    def isatty(self):
+        if self.target is not None and hasattr(self.target, "isatty"):
+            return self.target.isatty()
+        return False
+
+    def fileno(self):
+        if self.target is not None and hasattr(self.target, "fileno"):
+            return self.target.fileno()
+        raise io.UnsupportedOperation("fileno")
+
+if sys.stdout is None:
+    sys.stdout = SafeStream(None, log_file=LOG_FILE)
+else:
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        sys.stdout = SafeStream(sys.stdout, log_file=LOG_FILE)
+
+if sys.stderr is None:
+    sys.stderr = SafeStream(None, log_file=LOG_FILE)
+else:
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        sys.stderr = SafeStream(sys.stderr, log_file=LOG_FILE)
+
 def free_port(port: int):
     """Ensure port is available by terminating stale instances."""
     current_pid = os.getpid()
