@@ -1,14 +1,17 @@
 @echo off
-title Stop AetherDesk Server
+title Stop AirDesk Server
 cd /d "%~dp0"
 
-echo Stopping AetherDesk Server...
+echo Stopping AirDesk Server...
 
-if exist "%~dp0aetherdesk.pid" (
-    set /p PID=<"%~dp0aetherdesk.pid"
+if exist "%~dp0airdesk.pid" (
+    set /p PID=<"%~dp0airdesk.pid"
     if defined PID (
         taskkill /f /pid %PID% >nul 2>&1
     )
+    del "%~dp0airdesk.pid" >nul 2>&1
+)
+if exist "%~dp0aetherdesk.pid" (
     del "%~dp0aetherdesk.pid" >nul 2>&1
 )
 
@@ -16,4 +19,4 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000 ^| findstr LISTENING') 
     taskkill /f /pid %%a >nul 2>&1
 )
 
-echo AetherDesk Server is stopped.
+echo AirDesk Server is stopped.

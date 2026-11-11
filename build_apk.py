@@ -19,7 +19,8 @@ SIGNER_JAR = os.path.join(BUILD_TOOLS, "uber-apk-signer.jar")
 
 COMPILED_RES = os.path.join(APP_DIR, "compiled_res.zip")
 UNALIGNED_APK = os.path.join(APP_DIR, "unaligned.apk")
-FINAL_APK = os.path.join(BASE_DIR, "AetherDesk_RedmiPadPro.apk")
+FINAL_APK = os.path.join(BASE_DIR, "AirDesk.apk")
+TABLET_APK = os.path.join(BASE_DIR, "AirDesk_RedmiPadPro.apk")
 
 def run_cmd(cmd, desc):
     print(f"--> {desc}...")
@@ -33,9 +34,12 @@ def run_cmd(cmd, desc):
 
 def main():
     print("=" * 60)
-    print("  Building AetherDesk APK for Redmi Pad Pro...")
+    print("  Building AirDesk APK (Universal & Redmi Pad Pro)...")
     print("=" * 60)
 
+    # Clean old bin
+    if os.path.exists(BIN_DIR):
+        shutil.rmtree(BIN_DIR, ignore_errors=True)
     os.makedirs(BIN_DIR, exist_ok=True)
 
     # 1. Compile Resources with aapt2
@@ -92,12 +96,17 @@ def main():
 
     if signed_apk and os.path.exists(signed_apk):
         shutil.copy2(signed_apk, FINAL_APK)
-        universal_apk = os.path.join(BASE_DIR, "AetherDesk.apk")
-        shutil.copy2(signed_apk, universal_apk)
+        shutil.copy2(signed_apk, TABLET_APK)
+        
+        releases_dir = os.path.join(BASE_DIR, "releases")
+        os.makedirs(releases_dir, exist_ok=True)
+        shutil.copy2(signed_apk, os.path.join(releases_dir, "AirDesk.apk"))
+        shutil.copy2(signed_apk, os.path.join(releases_dir, "AirDesk_RedmiPadPro.apk"))
+
         print("\n" + "=" * 60)
-        print(f"  🎉 SUCCESS! APK Built Successfully!")
-        print(f"  📦 Tablet APK File: {FINAL_APK}")
-        print(f"  📦 Universal APK   : {universal_apk}")
+        print(f"  🎉 SUCCESS! AirDesk APK Built Successfully!")
+        print(f"  📦 Universal APK   : {FINAL_APK}")
+        print(f"  📦 Tablet APK File : {TABLET_APK}")
         print(f"  📊 Size: {os.path.getsize(FINAL_APK) / 1024:.1f} KB")
         print("=" * 60)
     else:

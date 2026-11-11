@@ -1,6 +1,6 @@
 {
-  "name": "AetherDesk Remote Desktop",
-  "short_name": "AetherDesk",
+  "name": "AirDesk Remote Desktop",
+  "short_name": "AirDesk",
   "description": "Ultra low-latency personal remote desktop",
   "start_url": "/",
   "display": "standalone",

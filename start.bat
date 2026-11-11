@@ -1,9 +1,9 @@
 @echo off
-title AetherDesk Remote Desktop Server
+title AirDesk Remote Desktop Server
 cd /d "%~dp0"
 
 echo ======================================================
-echo    Starting AetherDesk Server...
+echo    Starting AirDesk Server...
 echo ======================================================
 echo.
 

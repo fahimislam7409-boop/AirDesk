@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.aetherdesk.remote;
+package com.airdesk.remote;
 
 public final class R {
   public static final class color {

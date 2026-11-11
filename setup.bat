@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-title AetherDesk - Setup & Installer
+title AirDesk - Setup & Installer
 cd /d "%~dp0"
 
 :: Self-elevation to Administrator for Firewall
@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 )
 
 echo ============================================================
-echo   ⚡ AetherDesk - Universal One-Click Setup
+echo   ⚡ AirDesk - Universal One-Click Setup
 echo ============================================================
 echo.
 
@@ -41,8 +41,11 @@ echo [2/3] Configuring Windows Defender Firewall (TCP 8000 & UDP 8001)...
 netsh advfirewall firewall delete rule name="AetherDesk" >nul 2>&1
 netsh advfirewall firewall delete rule name="AetherDesk TCP" >nul 2>&1
 netsh advfirewall firewall delete rule name="AetherDesk UDP Discovery" >nul 2>&1
-netsh advfirewall firewall add rule name="AetherDesk TCP" dir=in action=allow protocol=TCP localport=8000 profile=any >nul 2>&1
-netsh advfirewall firewall add rule name="AetherDesk UDP Discovery" dir=in action=allow protocol=UDP localport=8001 profile=any >nul 2>&1
+netsh advfirewall firewall delete rule name="AirDesk" >nul 2>&1
+netsh advfirewall firewall delete rule name="AirDesk TCP" >nul 2>&1
+netsh advfirewall firewall delete rule name="AirDesk UDP Discovery" >nul 2>&1
+netsh advfirewall firewall add rule name="AirDesk TCP" dir=in action=allow protocol=TCP localport=8000 profile=any >nul 2>&1
+netsh advfirewall firewall add rule name="AirDesk UDP Discovery" dir=in action=allow protocol=UDP localport=8001 profile=any >nul 2>&1
 echo       [OK] Firewall rules configured for local streaming and LAN auto-discovery!
 echo.
 
@@ -61,10 +64,11 @@ echo ============================================================
 echo.
 echo   • To run now in terminal with QR code : start.bat
 echo   • To enable automatic startup with PC : install_startup.bat
-echo   • Install on your Tablet / Phone      : AetherDesk.apk
+echo   • Install on your Tablet / Phone      : AirDesk.apk
 echo.
 
-set /p LAUNCH="Would you like to start AetherDesk now? (Y/N): "
+set /p LAUNCH="Would you like to start AirDesk now? (Y/N): "
 if /i "!LAUNCH!"=="Y" (
     start "" "%~dp0start.bat"
 )
+

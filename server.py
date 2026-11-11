@@ -27,8 +27,8 @@ from input_controller import InputController
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 CONFIG_FILE = BASE_DIR / "config.json"
-PID_FILE = BASE_DIR / "aetherdesk.pid"
-LOG_FILE = BASE_DIR / "aetherdesk.log"
+PID_FILE = BASE_DIR / "airdesk.pid"
+LOG_FILE = BASE_DIR / "airdesk.log"
 
 # Save PID for clean stopping
 try:
@@ -97,10 +97,10 @@ class DiscoveryProtocol(asyncio.DatagramProtocol):
     def datagram_received(self, data, addr):
         try:
             msg = data.decode("utf-8", errors="ignore").strip()
-            if "AETHERDESK_DISCOVER" in msg:
+            if "AIRDESK_DISCOVER" in msg or "AETHERDESK_DISCOVER" in msg:
                 my_ip = get_local_ip()
                 payload = json.dumps({
-                    "magic": "AETHERDESK_BEACON",
+                    "magic": "AIRDESK_BEACON",
                     "hostname": socket.gethostname(),
                     "ip": my_ip,
                     "port": self.http_port,
@@ -145,7 +145,7 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass
 
-app = FastAPI(title="AetherDesk Remote Server", lifespan=lifespan)
+app = FastAPI(title="AirDesk Remote Server", lifespan=lifespan)
 
 # Static files mount with no-cache headers
 @app.middleware("http")
@@ -202,7 +202,7 @@ async def get_index():
     index_path = STATIC_DIR / "index.html"
     if index_path.exists():
         return FileResponse(index_path)
-    return "<h1>AetherDesk: static/index.html not found.</h1>"
+    return "<h1>AirDesk: static/index.html not found.</h1>"
 
 @app.get("/manifest.json")
 async def get_manifest():
@@ -214,13 +214,14 @@ async def get_manifest():
 @app.api_route("/apk", methods=["GET", "HEAD"])
 @app.api_route("/download", methods=["GET", "HEAD"])
 async def download_apk():
-    apk_path = BASE_DIR / "AetherDesk_RedmiPadPro.apk"
-    if apk_path.exists():
-        return FileResponse(
-            path=str(apk_path),
-            filename="AetherDesk_RedmiPadPro.apk",
-            media_type="application/vnd.android.package-archive"
-        )
+    for name in ["AirDesk.apk", "AirDesk_RedmiPadPro.apk", "AetherDesk_RedmiPadPro.apk"]:
+        apk_path = BASE_DIR / name
+        if apk_path.exists():
+            return FileResponse(
+                path=str(apk_path),
+                filename="AirDesk.apk",
+                media_type="application/vnd.android.package-archive"
+            )
     raise HTTPException(status_code=404, detail="APK file not found")
 
 @app.post("/api/login")
@@ -402,7 +403,7 @@ async def websocket_endpoint(websocket: WebSocket):
 def print_banner(ip, port):
     url = f"http://{ip}:{port}"
     print("\n" + "=" * 60)
-    print("  🚀 AetherDesk Remote Desktop Server is LIVE!")
+    print("  🚀 AirDesk Remote Desktop Server is LIVE!")
     print("=" * 60)
     print(f"  👉 Tablet / Phone URL : {url}")
     print(f"  👉 Local PC URL       : http://localhost:{port}")

@@ -1,4 +1,4 @@
-package com.aetherdesk.remote;
+package com.airdesk.remote;
 
 import android.app.Activity;
 import android.content.Context;
@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends Activity {
 
-    private static final String PREFS_NAME = "AetherDeskPrefs";
+    private static final String PREFS_NAME = "AirDeskPrefs";
     private static final String KEY_HOST = "host_ip";
     private static final String KEY_PORT = "port";
     private static final String KEY_PIN = "pin";
@@ -234,7 +234,7 @@ public class MainActivity extends Activity {
             WifiManager.MulticastLock multicastLock = null;
             try {
                 if (wifi != null) {
-                    multicastLock = wifi.createMulticastLock("AetherDeskDiscovery");
+                    multicastLock = wifi.createMulticastLock("AirDeskDiscovery");
                     multicastLock.setReferenceCounted(true);
                     multicastLock.acquire();
                 }
@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
                 socket.setBroadcast(true);
                 socket.setSoTimeout(1200);
 
-                byte[] sendData = "AETHERDESK_DISCOVER".getBytes(StandardCharsets.UTF_8);
+                byte[] sendData = "AIRDESK_DISCOVER".getBytes(StandardCharsets.UTF_8);
 
                 // Broadcast to global subnet broadcast
                 DatagramPacket p1 = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 8001);

@@ -1,9 +1,9 @@
-# AetherDesk ⚡
+# AirDesk ⚡
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://www.python.org/)
 [![Hardware Acceleration](https://img.shields.io/badge/Hardware%20Accel-NVIDIA%20RTX%20%7C%20DirectX%20Duplication-green?logo=nvidia)](https://github.com/ra1nty/DXcam)
-[![Android](https://img.shields.io/badge/Android-APK%20Included-brightgreen?logo=android)](releases/AetherDesk.apk)
+[![Android](https://img.shields.io/badge/Android-APK%20Included-brightgreen?logo=android)](releases/AirDesk.apk)
 [![Latency](https://img.shields.io/badge/Latency-%3C50ms-orange)](#-performance--architecture)
 
 > **A lightweight, GPU-accelerated, self-hosted remote desktop system with zero-configuration LAN auto-discovery.**  
@@ -11,11 +11,11 @@
 
 ---
 
-## 🌟 Why AetherDesk?
+## 🌟 Why AirDesk?
 
 Traditional remote desktop tools (like Chrome Remote Desktop, TeamViewer, or AnyDesk) route data through third-party cloud servers, require accounts, and often suffer from lag, latency, and aspect ratio letterboxing on tablets. 
 
-**AetherDesk** is built for pure local speed, privacy, and flawless tablet usability:
+**AirDesk** is built for pure local speed, privacy, and flawless tablet usability:
 - **100% Private & Self-Hosted**: Runs entirely within your home Wi-Fi. Zero data ever leaves your local network. No accounts, no subscriptions.
 - **⚡ Hardware-Accelerated 60 FPS Capture**: Direct Desktop Duplication API via `DXCam` leveraging your dedicated GPU (NVIDIA RTX / AMD / Intel) with zero CPU overhead.
 - **🔍 Zero-Config LAN Auto-Discovery**: No need to memorize or look up IP addresses! The Android app and host PC use UDP beacon discovery to detect each other within milliseconds on **any** router or subnet (`192.168.x.x`, `10.x.x.x`, etc.).
@@ -26,7 +26,7 @@ Traditional remote desktop tools (like Chrome Remote Desktop, TeamViewer, or Any
 
 ---
 
-## 📸 Screenshots & Architecture
+## 📸 Architecture
 
 ```mermaid
 flowchart LR
@@ -57,9 +57,9 @@ flowchart LR
 | :--- | :--- |
 | **[`setup.bat`](setup.bat)** | **One-Click Universal Setup**: Checks Python, installs dependencies, and configures Windows Firewall automatically. |
 | **[`start.bat`](start.bat)** | Interactive launcher showing local IP and terminal ASCII QR code for camera scanning. |
-| **[`install_startup.bat`](install_startup.bat)** | UAC-elevated installer to make AetherDesk automatically run invisibly whenever Windows boots. |
+| **[`install_startup.bat`](install_startup.bat)** | UAC-elevated installer to make AirDesk automatically run invisibly whenever Windows boots. |
 | **[`stop.bat`](stop.bat)** | Safely stops any running background server processes. |
-| **[`AetherDesk.apk`](AetherDesk.apk)** | **Universal Android APK**: Pre-compiled, signed (V1/V2/V3), and ready to install on Android phones and tablets. |
+| **[`AirDesk.apk`](AirDesk.apk)** | **Universal Android APK**: Pre-compiled, signed (V1/V2/V3), and ready to install on Android phones and tablets. |
 | **[`releases/`](releases/)** | Holds release-ready APK packages for instant download. |
 | **[`android_app/`](android_app/)** | Complete native Android source code (compatible with Android Studio or CLI D8/AAPT2). |
 | **[`server.py`](server.py)** | FastAPI backend, WebSockets, WebRTC signaling, and UDP discovery engine. |
@@ -74,8 +74,8 @@ flowchart LR
 
 1. Clone or download this repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/AetherDesk.git
-   cd AetherDesk
+   git clone https://github.com/YOUR_USERNAME/AirDesk.git
+   cd AirDesk
    ```
 2. Double-click **`setup.bat`**:
    - Automatically installs required Python packages (`pip install -r requirements.txt`).
@@ -92,8 +92,8 @@ flowchart LR
 You can connect in two different ways:
 
 #### Option A: Dedicated Native Android App (Best Experience)
-1. Transfer and install **[`AetherDesk.apk`](releases/AetherDesk.apk)** onto your Android tablet or phone (or open `http://<PC_IP>:8000/apk` in your mobile browser to download directly).
-2. Open the **AetherDesk** app.
+1. Transfer and install **[`AirDesk.apk`](releases/AirDesk.apk)** onto your Android tablet or phone (or open `http://<PC_IP>:8000/apk` in your mobile browser to download directly).
+2. Open the **AirDesk** app.
 3. Tap **🔍 Auto Discover PC**: The app automatically detects your PC on your home Wi-Fi—no IP typing required!
 4. Tap **⚡ Connect to Desktop**. That's it!
 

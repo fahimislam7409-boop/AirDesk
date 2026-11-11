@@ -1,4 +1,4 @@
-// AetherDesk Client - Perfect Viewport & Chrome Remote Desktop Architecture
+// AirDesk Client - Perfect Viewport & Chrome Remote Desktop Architecture
 
 (() => {
   // Elements
