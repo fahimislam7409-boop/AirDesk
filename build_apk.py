@@ -37,10 +37,17 @@ def main():
     print("  Building AirDesk APK (Universal & Redmi Pad Pro)...")
     print("=" * 60)
 
-    # Clean old bin
+    # Clean old bin and intermediate files
     if os.path.exists(BIN_DIR):
         shutil.rmtree(BIN_DIR, ignore_errors=True)
     os.makedirs(BIN_DIR, exist_ok=True)
+
+    for temp_f in [COMPILED_RES, UNALIGNED_APK, os.path.join(APP_DIR, "unaligned-aligned-debugSigned.apk"), os.path.join(APP_DIR, "unaligned-aligned-debugSigned.apk.idsig")]:
+        if os.path.exists(temp_f):
+            try:
+                os.remove(temp_f)
+            except Exception:
+                pass
 
     # 1. Compile Resources with aapt2
     run_cmd(f'"{AAPT2}" compile --dir "{RES_DIR}" -o "{COMPILED_RES}"', "Compiling Android resources")
@@ -84,7 +91,7 @@ def main():
 
     # 8. Sign and zipalign with uber-apk-signer (v1, v2, v3, v4 signatures)
     print("--> Signing & zipaligning APK...")
-    run_cmd(f'java -jar "{SIGNER_JAR}" --apks "{UNALIGNED_APK}" -o "{APP_DIR}" --overwrite', "Signing APK")
+    run_cmd(f'java -jar "{SIGNER_JAR}" --apks "{UNALIGNED_APK}" -o "{APP_DIR}"', "Signing APK")
 
     # Find signed apk output
     signed_apk = os.path.join(APP_DIR, "unaligned-aligned-debugSigned.apk")
