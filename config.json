@@ -1,0 +1,11 @@
+{
+  "host": "0.0.0.0",
+  "port": 8000,
+  "pin": "123456",
+  "auth_required": true,
+  "fps": 30,
+  "quality": 75,
+  "scale": 1.0,
+  "default_mode": "touchpad"
+}
+

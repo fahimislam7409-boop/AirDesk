@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
+
+    <!-- Dashboard Container (Landscape 2-Column Split) -->
+    <LinearLayout
+        android:id="@+id/dashboard_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="32dp"
+        android:gravity="center"
+        android:baselineAligned="false">
+
+        <!-- Left Info Column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingEnd="32dp">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@drawable/ic_launcher"
+                android:contentDescription="@string/app_name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="AetherDesk"
+                android:textColor="@color/text_white"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Personal Remote Desktop"
+                android:textColor="@color/primary_blue"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Redmi Pad Pro Edition • 2.5K 120Hz"
+                android:textColor="@color/accent_emerald"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Direct, zero-lag desktop streaming over home Wi-Fi. Full touch gestures, trackpad control, and complete Windows 11 Taskbar support."
+                android:textColor="@color/text_muted"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp" />
+
+            <TextView
+                android:id="@+id/txt_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="● Ready to Connect"
+                android:textColor="@color/accent_cyan"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Right Connect Card Column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:background="@drawable/card_background"
+            android:orientation="vertical"
+            android:padding="28dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connect to Computer"
+                android:textColor="@color/text_white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Enter the IP address shown when you run start.bat on PC"
+                android:textColor="@color/text_muted"
+                android:textSize="13sp" />
+
+            <!-- IP and Port Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/input_host"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="3"
+                    android:background="@drawable/input_background"
+                    android:hint="@string/host_hint"
+                    android:textColorHint="@color/text_hint"
+                    android:textColor="@color/text_white"
+                    android:textSize="16sp"
+                    android:inputType="textUri"
+                    android:singleLine="true" />
+
+                <EditText
+                    android:id="@+id/input_port"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1.2"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/input_background"
+                    android:hint="@string/port_hint"
+                    android:textColorHint="@color/text_hint"
+                    android:textColor="@color/text_white"
+                    android:textSize="16sp"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:text="8000" />
+            </LinearLayout>
+
+            <!-- PIN Input -->
+            <EditText
+                android:id="@+id/input_pin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/input_background"
+                android:hint="@string/pin_hint"
+                android:textColorHint="@color/text_hint"
+                android:textColor="@color/text_white"
+                android:textSize="16sp"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:text="123456" />
+
+            <!-- Connect Button -->
+            <Button
+                android:id="@+id/btn_connect"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_primary"
+                android:text="@string/connect_btn"
+                android:textColor="@color/text_white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Auto-Discover Button -->
+            <Button
+                android:id="@+id/btn_discover"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_secondary"
+                android:text="@string/auto_discover_btn"
+                android:textColor="@color/text_muted"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Fullscreen Remote Desktop Viewport -->
+    <WebView
+        android:id="@+id/remote_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- In-Session Floating Exit Button -->
+    <Button
+        android:id="@+id/btn_exit_session"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="12dp"
+        android:layout_gravity="top|end"
+        android:background="@drawable/btn_secondary"
+        android:text="✕"
+        android:textColor="@color/text_white"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+</FrameLayout>
+

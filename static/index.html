@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover">
+  <title>AetherDesk - Personal Remote Desktop</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#090d16">
+  <link rel="icon" type="image/png" href="/static/icon.png">
+  <link rel="stylesheet" href="/static/styles.css?v=2.2.0">
+</head>
+<body>
+  <!-- Connecting Screen / Splash -->
+  <div id="splash-overlay" class="modal-overlay open">
+    <div class="modal-card splash-card">
+      <div class="brand-logo pulse">⚡</div>
+      <h2>AetherDesk Remote</h2>
+      <p id="splash-status">Connecting to PC...</p>
+      
+      <!-- PIN Login Section -->
+      <div id="login-section" class="pin-container" style="display: none;">
+        <input type="password" id="pin-input" maxlength="12" placeholder="Enter PIN (Default: 123456)" inputmode="numeric" autocomplete="off">
+        <button id="btn-login" class="btn-primary">Connect to Desktop</button>
+        <div id="login-error" class="error-msg"></div>
+
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center;">
+          <a href="/apk" download class="btn-apk-download" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #38bdf8; text-decoration: none; padding: 8px 16px; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 999px; transition: all 0.2s ease;">
+            <span>📱</span>
+            <span>Download Redmi Pad Pro APK</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Viewport (100% Guaranteed Full Desktop View) -->
+  <div id="display-container" class="display-container">
+    <canvas id="remote-canvas"></canvas>
+    <video id="remote-video" autoplay playsinline muted></video>
+    <div id="touch-indicator" class="touch-indicator"></div>
+  </div>
+
+  <!-- Discreet Floating Action Button (FAB Menu) - Chrome Remote Desktop Style -->
+  <button id="fab-menu" class="fab-menu" title="Remote Menu">
+    <span class="fab-icon">⚡</span>
+    <span class="fab-badge" id="fab-status-dot"></span>
+  </button>
+
+  <!-- Optional Side Mouse Helper (Vertical in right margin, 0% taskbar overlap) -->
+  <div id="side-mouse-bar" class="side-mouse-bar">
+    <button id="side-btn-left" class="side-btn" title="Left Click">L</button>
+    <button id="side-btn-right" class="side-btn" title="Right Click">R</button>
+    <div class="side-scroll-widget" id="side-scroll-widget" title="Slide to scroll">
+      <span class="side-scroll-arrow">▲</span>
+      <div class="side-scroll-track" id="side-scroll-track">
+        <div class="side-scroll-thumb" id="side-scroll-thumb"></div>
+      </div>
+      <span class="side-scroll-arrow">▼</span>
+    </div>
+    <button id="side-btn-hide" class="side-btn icon-btn" title="Hide Side Bar">✕</button>
+  </div>
+
+  <!-- Slide-out Control Center Panel -->
+  <div id="control-panel" class="control-panel">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span class="brand-bolt">⚡</span>
+        <div>
+          <h3>AetherDesk</h3>
+          <span id="panel-pc-info" class="panel-subtitle">Connected</span>
+        </div>
+      </div>
+      <button id="btn-close-panel" class="icon-btn close-panel-btn">✕</button>
+    </div>
+
+    <div class="panel-content">
+      <!-- Screen Scaling Option (Fit vs Fill) -->
+      <div class="panel-section">
+        <label class="section-label">Desktop Viewport</label>
+        <div class="mode-selector">
+          <button id="scale-fit-btn" class="mode-btn active">
+            <span class="mode-emoji">🖥️</span>
+            <div>
+              <strong>Fit Screen (Recommended)</strong>
+              <small>100% of Windows Taskbar visible</small>
+            </div>
+          </button>
+          <button id="scale-fill-btn" class="mode-btn">
+            <span class="mode-emoji">📐</span>
+            <div>
+              <strong>Fill / Stretch Screen</strong>
+              <small>Edge-to-edge full tablet</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interaction Mode -->
+      <div class="panel-section">
+        <label class="section-label">Interaction Mode</label>
+        <div class="mode-selector">
+          <button id="mode-trackpad-btn" class="mode-btn active">
+            <span class="mode-emoji">🖱️</span>
+            <div>
+              <strong>Trackpad Mode</strong>
+              <small>Laptop gesture controls</small>
+            </div>
+          </button>
+          <button id="mode-touch-btn" class="mode-btn">
+            <span class="mode-emoji">👆</span>
+            <div>
+              <strong>Direct Touch</strong>
+              <small>Tap directly on screen</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Tools -->
+      <div class="panel-section">
+        <label class="section-label">Quick Tools</label>
+        <div class="tools-grid">
+          <button id="btn-open-kbd" class="tool-btn">
+            <span class="tool-icon">⌨️</span>
+            <span>Keyboard</span>
+          </button>
+          <button id="btn-open-actions" class="tool-btn">
+            <span class="tool-icon">⚡</span>
+            <span>Shortcuts</span>
+          </button>
+          <button id="btn-toggle-side-mouse" class="tool-btn">
+            <span class="tool-icon">🖱️</span>
+            <span id="side-mouse-label">Side Mouse</span>
+          </button>
+          <button id="btn-fullscreen-panel" class="tool-btn">
+            <span class="tool-icon">⛶</span>
+            <span>Fullscreen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Performance Settings -->
+      <div class="panel-section">
+        <label class="section-label">Stream Performance</label>
+        <div class="settings-rows">
+          <div class="setting-row">
+            <span>FPS:</span>
+            <select id="setting-fps">
+              <option value="60">60 FPS (Ultra Smooth)</option>
+              <option value="30" selected>30 FPS (Balanced)</option>
+              <option value="15">15 FPS (Battery Saver)</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <span>Quality:</span>
+            <select id="setting-quality">
+              <option value="90">Ultra (90%)</option>
+              <option value="80">High (80%)</option>
+              <option value="70" selected>Balanced (70%)</option>
+              <option value="50">Low (50%)</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <span>Trackpad Sens: <b id="sens-label">1.2x</b></span>
+            <input type="range" id="setting-sens" min="0.5" max="3.0" step="0.1" value="1.2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Gestures Cheat Sheet -->
+      <div class="panel-section gestures-card">
+        <label class="section-label">Gesture Guide</label>
+        <ul class="gesture-list">
+          <li>👉 <b>1 Finger Swipe:</b> Move cursor</li>
+          <li>👆 <b>1 Finger Tap:</b> Left click</li>
+          <li>✌️ <b>2 Finger Tap:</b> Right click</li>
+          <li>📜 <b>2 Finger Swipe:</b> Scroll up/down</li>
+          <li>✊ <b>Hold & Drag:</b> Click and drag</li>
+        </ul>
+      </div>
+
+      <!-- Logout -->
+      <div class="panel-footer">
+        <button id="btn-disconnect" class="btn-secondary">Disconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Drawer -->
+  <div id="keyboard-drawer" class="drawer bottom-drawer">
+    <div class="drawer-header">
+      <span>Virtual Keyboard & Text</span>
+      <button id="btn-close-kbd" class="icon-btn">✕</button>
+    </div>
+    
+    <div class="text-input-row">
+      <input type="text" id="type-text-input" placeholder="Type text in English or Bengali..." autocomplete="off">
+      <button id="btn-send-text" class="btn-primary">Send to PC</button>
+    </div>
+
+    <div class="kbd-row">
+      <button class="kbd-key mod-key" data-key="esc">Esc</button>
+      <button class="kbd-key mod-key" data-key="tab">Tab</button>
+      <button class="kbd-key mod-key toggle-key" id="key-win" data-key="win">Win</button>
+      <button class="kbd-key mod-key toggle-key" id="key-ctrl" data-key="ctrl">Ctrl</button>
+      <button class="kbd-key mod-key toggle-key" id="key-alt" data-key="alt">Alt</button>
+      <button class="kbd-key mod-key toggle-key" id="key-shift" data-key="shift">Shift</button>
+      <button class="kbd-key mod-key" data-key="backspace">⌫ Back</button>
+      <button class="kbd-key mod-key" data-key="delete">Del</button>
+    </div>
+
+    <div class="kbd-row">
+      <button class="kbd-key" data-key="arrowup">↑</button>
+      <button class="kbd-key" data-key="arrowdown">↓</button>
+      <button class="kbd-key" data-key="arrowleft">←</button>
+      <button class="kbd-key" data-key="arrowright">→</button>
+      <button class="kbd-key" data-key="pageup">PgUp</button>
+      <button class="kbd-key" data-key="pagedown">PgDn</button>
+      <button class="kbd-key kbd-enter" data-key="enter">↵ Enter</button>
+    </div>
+  </div>
+
+  <!-- Actions & Media Modal -->
+  <div id="actions-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>⚡ System Shortcuts & Media</h3>
+        <button id="btn-close-actions" class="icon-btn">✕</button>
+      </div>
+      
+      <div class="section-title">Windows Actions</div>
+      <div class="grid-buttons">
+        <button class="action-btn" data-action="win_d">🖥️ Show Desktop (Win+D)</button>
+        <button class="action-btn" data-action="alt_tab">🔄 Switch App (Alt+Tab)</button>
+        <button class="action-btn" data-action="task_mgr">📊 Task Manager</button>
+        <button class="action-btn" data-action="ctrl_c">📋 Copy (Ctrl+C)</button>
+        <button class="action-btn" data-action="ctrl_v">📥 Paste (Ctrl+V)</button>
+        <button class="action-btn" data-action="ctrl_z">↩️ Undo (Ctrl+Z)</button>
+        <button class="action-btn btn-danger" data-action="lock">🔒 Lock PC (Win+L)</button>
+      </div>
+
+      <div class="section-title">Media Controls</div>
+      <div class="grid-buttons media-grid">
+        <button class="action-btn" data-action="vol_up">🔊 Vol +</button>
+        <button class="action-btn" data-action="vol_down">🔉 Vol -</button>
+        <button class="action-btn" data-action="vol_mute">🔇 Mute</button>
+        <button class="action-btn" data-action="play_pause">⏯️ Play / Pause</button>
+        <button class="action-btn" data-action="prev_track">⏮️ Prev</button>
+        <button class="action-btn" data-action="next_track">⏭️ Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js?v=2.2.0"></script>
+</body>
+</html>

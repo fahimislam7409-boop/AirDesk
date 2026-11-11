@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# AetherDesk Runtime State & Logs
+*.pid
+*.log
+aetherdesk.pid
+aetherdesk.log
+
+# Build Tools & Android Intermediate Build Artifacts
+build_tools/
+android_app/bin/
+android_app/compiled_res.zip
+android_app/unaligned.apk
+android_app/classes.dex
+android_app/*-aligned-*
+android_app/*.idsig
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS Artifacts
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

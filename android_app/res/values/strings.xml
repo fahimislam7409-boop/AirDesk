@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AetherDesk</string>
+    <string name="tagline">Personal Remote Desktop</string>
+    <string name="edition_badge">Redmi Pad Pro Edition • 2.5K 120Hz</string>
+    <string name="connect_btn">CONNECT TO DESKTOP</string>
+    <string name="auto_discover_btn">AUTO-DISCOVER PC</string>
+    <string name="host_hint">PC IP (e.g. 192.168.1.164)</string>
+    <string name="port_hint">Port (8000)</string>
+    <string name="pin_hint">PIN Code (123456)</string>
+</resources>
+
