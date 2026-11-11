@@ -412,6 +412,12 @@ def print_banner(ip, port):
         print(f"  🔑 Security PIN Code  : {config['pin']}")
     else:
         print("  🔓 Security PIN       : None (Disabled)")
+    print("-" * 60)
+    print("  👨‍💻 Developer         : Fahim Islam")
+    print("  🌐 Facebook          : https://www.facebook.com/fahim.islam.7409/")
+    print("  📺 YouTube Channel   : https://www.youtube.com/@FreelancerFahimIslam")
+    print("  💬 WhatsApp          : @CoderFahim")
+    print("  🐙 GitHub            : https://github.com/fahimislam7409-boop/AirDesk")
     print("=" * 60)
     print("  📱 Scan with your Tablet or Phone Camera to Connect:")
     print("-" * 60)

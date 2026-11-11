@@ -1,13 +1,31 @@
 # AirDesk ⚡
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://www.python.org/)
+[![Developer](https://img.shields.io/badge/Developer-Fahim%20Islam-10b981?logo=github)](https://github.com/fahimislam7409-boop)
+[![Facebook](https://img.shields.io/badge/Facebook-Fahim%20Islam-1877F2?logo=facebook)](https://www.facebook.com/fahim.islam.7409/)
+[![YouTube](https://img.shields.io/badge/YouTube-Freelancer%20Fahim%20Islam-FF0000?logo=youtube)](https://www.youtube.com/@FreelancerFahimIslam/videos)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-%40CoderFahim-25D366?logo=whatsapp)](https://wa.me/message/CoderFahim)
 [![Hardware Acceleration](https://img.shields.io/badge/Hardware%20Accel-NVIDIA%20RTX%20%7C%20DirectX%20Duplication-green?logo=nvidia)](https://github.com/ra1nty/DXcam)
 [![Android](https://img.shields.io/badge/Android-APK%20Included-brightgreen?logo=android)](releases/AirDesk.apk)
 [![Latency](https://img.shields.io/badge/Latency-%3C50ms-orange)](#-performance--architecture)
 
 > **A lightweight, GPU-accelerated, self-hosted remote desktop system with zero-configuration LAN auto-discovery.**  
 > Seamlessly control your Windows PC or laptop from bed or anywhere in your home using an Android tablet, phone, or web browser.
+
+---
+
+## 👨‍💻 Developer & Community
+
+AirDesk is designed and developed with ❤️ by **Fahim Islam**.
+
+| Platform | Official Link / Handle |
+| :--- | :--- |
+| **🐙 GitHub Profile** | [@fahimislam7409-boop](https://github.com/fahimislam7409-boop) |
+| **📘 Facebook ID** | [Fahim Islam Profile](https://www.facebook.com/fahim.islam.7409/) |
+| **📺 YouTube Channel** | [@FreelancerFahimIslam](https://www.youtube.com/@FreelancerFahimIslam/videos) |
+| **💬 WhatsApp Contact** | **@CoderFahim** |
+
+Feel free to connect, give a star ⭐, report issues, or contribute to making AirDesk even better!
 
 ---
 
@@ -56,7 +74,7 @@ flowchart LR
 | File / Folder | Purpose |
 | :--- | :--- |
 | **[`setup.bat`](setup.bat)** | **One-Click Universal Setup**: Checks Python, installs dependencies, and configures Windows Firewall automatically. |
-| **[`start.bat`](start.bat)** | Interactive launcher showing local IP and terminal ASCII QR code for camera scanning. |
+| **[`start.bat`](start.bat)** | Interactive launcher showing local IP, developer info, and terminal ASCII QR code for camera scanning. |
 | **[`install_startup.bat`](install_startup.bat)** | UAC-elevated installer to make AirDesk automatically run invisibly whenever Windows boots. |
 | **[`stop.bat`](stop.bat)** | Safely stops any running background server processes. |
 | **[`AirDesk.apk`](AirDesk.apk)** | **Universal Android APK**: Pre-compiled, signed (V1/V2/V3), and ready to install on Android phones and tablets. |
@@ -74,7 +92,7 @@ flowchart LR
 
 1. Clone or download this repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/AirDesk.git
+   git clone https://github.com/fahimislam7409-boop/AirDesk.git
    cd AirDesk
    ```
 2. Double-click **`setup.bat`**:
@@ -117,7 +135,7 @@ You can connect in two different ways:
 | **2-Finger Tap** | Right mouse click |
 | **2-Finger Swipe Up / Down** | Smooth page scrolling |
 | **Long-Press & Drag** | Window dragging / text selection |
-| **⚡ Floating Button** | Opens slide-out Control Panel (Keyboard, Shortcuts, Settings) |
+| **⚡ Floating Button** | Opens slide-out Control Panel (Keyboard, Shortcuts, Settings, Developer links) |
 | **Side Mouse Bar (Optional)** | Dedicated bedside vertical L/R click buttons and thumb-scroll slider |
 
 ---
@@ -172,3 +190,7 @@ Contributions, feature requests, and bug reports are welcome!
 ## 📄 License
 
 Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more details.
+
+---
+
+© 2026 **Fahim Islam** • Built with passion for open source and ultra-fast hardware computing.

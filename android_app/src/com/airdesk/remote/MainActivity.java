@@ -2,10 +2,12 @@ package com.airdesk.remote;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -170,6 +172,28 @@ public class MainActivity extends Activity {
         btnDiscover.setOnClickListener(v -> autoDiscoverPC());
 
         btnExitSession.setOnClickListener(v -> exitSession());
+
+        // Developer info social links
+        Button btnFb = findViewById(R.id.btn_link_fb);
+        if (btnFb != null) btnFb.setOnClickListener(v -> openUrl("https://www.facebook.com/fahim.islam.7409/"));
+
+        Button btnYt = findViewById(R.id.btn_link_yt);
+        if (btnYt != null) btnYt.setOnClickListener(v -> openUrl("https://www.youtube.com/@FreelancerFahimIslam/videos"));
+
+        Button btnWa = findViewById(R.id.btn_link_wa);
+        if (btnWa != null) btnWa.setOnClickListener(v -> openUrl("https://wa.me/message/CoderFahim"));
+
+        Button btnGh = findViewById(R.id.btn_link_gh);
+        if (btnGh != null) btnGh.setOnClickListener(v -> openUrl("https://github.com/fahimislam7409-boop/AirDesk"));
+    }
+
+    private void openUrl(String url) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Could not open link: " + url, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void startSession() {
